@@ -30,6 +30,8 @@
 namespace nfd {
 namespace fw {
 
+NFD_LOG_INIT("Strategy.Ncc");
+
 const Name NccStrategy::STRATEGY_NAME("ndn:/localhost/nfd/strategy/ncc/%FD%01");
 NFD_REGISTER_STRATEGY(NccStrategy);
 
@@ -52,6 +54,8 @@ NccStrategy::afterReceiveInterest(const Face& inFace,
                                   shared_ptr<fib::Entry> fibEntry,
                                   shared_ptr<pit::Entry> pitEntry)
 {
+  NFD_LOG_DEBUG("afterReceiveInterest inFace=" << inFace.getId() << " interest=" << interest);
+
   const fib::NextHopList& nexthops = fibEntry->getNextHops();
   if (nexthops.size() == 0) {
     this->rejectPendingInterest(pitEntry);
@@ -170,6 +174,8 @@ NccStrategy::timeoutOnBestFace(weak_ptr<pit::Entry> pitEntryWeak)
   if (!static_cast<bool>(pitEntry)) {
     return;
   }
+  NFD_LOG_DEBUG("timeoutOnBestFace pitEntry=" << pitEntry->getName());
+
   shared_ptr<measurements::Entry> measurementsEntry = this->getMeasurements().get(*pitEntry);
 
   for (int i = 0; i < UPDATE_MEASUREMENTS_N_LEVELS; ++i) {
@@ -196,6 +202,7 @@ NccStrategy::beforeSatisfyInterest(shared_ptr<pit::Entry> pitEntry,
     // NCC does not collect measurements for non-best face
     return;
   }
+  NFD_LOG_DEBUG("beforeSatisfyInterest pitEntry=" << pitEntry->getName());
 
   shared_ptr<measurements::Entry> measurementsEntry = this->getMeasurements().get(*pitEntry);
 

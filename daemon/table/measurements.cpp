@@ -30,6 +30,8 @@
 
 namespace nfd {
 
+NFD_LOG_INIT("Measurements");
+
 using measurements::Entry;
 
 Measurements::Measurements(NameTree& nameTree)
@@ -146,6 +148,8 @@ void
 Measurements::extendLifetime(Entry& entry,
                              const time::nanoseconds& lifetime)
 {
+  NFD_LOG_DEBUG("extendLifetime entry=" << entry.getName());
+
   shared_ptr<name_tree::Entry> nte = m_nameTree.get(entry);
   if (nte == nullptr ||
       nte->getMeasurementsEntry().get() != &entry) {
@@ -167,6 +171,7 @@ Measurements::extendLifetime(Entry& entry,
 void
 Measurements::cleanup(Entry& entry)
 {
+  NFD_LOG_DEBUG("cleanup entry=" << entry.getName());
   shared_ptr<name_tree::Entry> nte = m_nameTree.get(entry);
   if (nte != nullptr) {
     nte->setMeasurementsEntry(nullptr);
