@@ -37,6 +37,9 @@
 #include <ndn-cxx/transport/transport.hpp>
 #include <ndn-cxx/util/scheduler.hpp>
 
+#include "ns3/object.h"
+#include "ns3/node.h"
+
 namespace nfd {
 namespace rib {
 
@@ -51,26 +54,7 @@ class Readvertise;
 class Service : noncopyable
 {
 public:
-  /**
-   * \brief create NFD-RIB service
-   * \param configFile absolute or relative path of configuration file
-   * \param keyChain the KeyChain
-   * \throw std::logic_error Instance of rib::Service has been already constructed
-   * \throw std::logic_error Instance of rib::Service is not constructed on RIB thread
-   */
-  Service(const std::string& configFile, ndn::KeyChain& keyChain);
-
-  /**
-   * \brief create NFD-RIB service
-   * \param configSection parsed configuration section
-   * \param keyChain the KeyChain
-   * \note This constructor overload is more appropriate for integrated environments,
-   *       such as NS-3 or android. Error messages related to configuration file
-   *       will use "internal://nfd.conf" as configuration filename.
-   * \throw std::logic_error Instance of rib::Service has been already constructed
-   * \throw std::logic_error Instance of rib::Service is not constructed on RIB thread
-   */
-  Service(const ConfigSection& configSection, ndn::KeyChain& keyChain);
+  Service(const ConfigSection& configSection, ndn::Face& face, ndn::KeyChain& keyChain);
 
   /**
    * \brief Destructor
@@ -93,7 +77,7 @@ public:
 
 private:
   template<typename ConfigParseFunc>
-  Service(ndn::KeyChain& keyChain, shared_ptr<ndn::Transport> localNfdTransport,
+  Service(ndn::KeyChain& keyChain, ndn::Face& face,
           const ConfigParseFunc& configParse);
 
   void
@@ -106,10 +90,8 @@ private:
   applyConfig(const ConfigSection& section, const std::string& filename);
 
 private:
-  static Service* s_instance;
-
   ndn::KeyChain& m_keyChain;
-  ndn::Face m_face;
+  ndn::Face& m_face;
   ndn::util::Scheduler m_scheduler;
   ndn::nfd::Controller m_nfdController;
 
